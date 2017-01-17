@@ -1,7 +1,6 @@
 from update_ip.services.base import BaseDNSService, DNSServiceError
 import urllib2
 import json
-from pprint import pprint
 
 try:
     import tld
@@ -94,9 +93,7 @@ class CloudflareService(BaseDNSService):
 
         self.request.get_method = lambda: 'PUT'
         result = self.opener.open(self.request)
-        pprint(result)
-        data = self.parse_result(result.read())
-        pprint(data)
+        # data = self.parse_result(result.read())
 
     def get_zones(self):
         """Get the zone info for selected domain
