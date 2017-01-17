@@ -23,10 +23,6 @@ class CloudflareService(BaseDNSService):
         # Updates the known TLD names
         tld.utils.update_tld_names()
 
-        # HTTP request and opener variables
-        self.request = None
-        self.opener = urllib2.build_opener(urllib2.HTTPHandler)
-
         # Cloudflare data
         self.email = email
         self.api_key = api_key
@@ -86,18 +82,19 @@ class CloudflareService(BaseDNSService):
             self.__update_ip(ip, True)
             return
 
-        self.__create_request(self.__update_url(),
-                              json.dumps({'name': self.dns_record, 'type': self.record_type, 'content': ip})
-                              )
+        request = self.__create_request(self.__update_url,
+                                        json.dumps({'name': self.dns_record, 'type': self.record_type, 'content': ip})
+                                        )
 
-        self.request.get_method = lambda: 'PUT'
-        result = self.opener.open(self.request)
+        request.get_method = lambda: 'PUT'
+        opener = urllib2.build_opener(urllib2.HTTPHandler)
+        result = opener.open(request)
         # data = self.parse_result(result.read())
 
     def __get_zones(self):
         """Get the zone info for selected domain
         """
-        data = self.__api_get_request(self.__zones_list_url())
+        data = self.__api_get_request(self.__zones_list_url)
         if len(data[u'result']) > 0:
             self.zone_id = data[u'result'][0][u'id']
         else:
@@ -117,7 +114,7 @@ class CloudflareService(BaseDNSService):
             self.__get_dns_record(True)
             return
 
-        data = self.__api_get_request(self.__dns_list_url())
+        data = self.__api_get_request(self.__dns_list_url)
 
         if len(data[u'result']) > 0:
             self.record_id = data[u'result'][0][u'id']
@@ -130,8 +127,8 @@ class CloudflareService(BaseDNSService):
         """Makes a GET request to API and return parsed JSON
         :param url: URL address
         """
-        self.__create_request(url)
-        return self.__parse_result(urllib2.urlopen(self.request))
+        request = self.__create_request(url)
+        return self.__parse_result(urllib2.urlopen(request))
 
     def __create_request(self, url, data=None):
         """Creates the HTTP request and add headers
@@ -139,16 +136,19 @@ class CloudflareService(BaseDNSService):
         :param data: Request Data
         """
         if data is None:
-            self.request = urllib2.Request(url)
+            request = urllib2.Request(url)
         else:
-            self.request = urllib2.Request(url, data)
-        self.__add_url_headers()
+            request = urllib2.Request(url, data)
 
-    def __add_url_headers(self):
+        request = self.__add_url_headers(request)
+        return request
+
+    def __add_url_headers(self, request):
         """Add headers to petition with auth data and other needed headers"""
-        self.request.add_header('Content-Type', 'application/json')
-        self.request.add_header('X-Auth-Key', self.api_key)
-        self.request.add_header('X-Auth-Email', self.email)
+        request.add_header('Content-Type', 'application/json')
+        request.add_header('X-Auth-Key', self.api_key)
+        request.add_header('X-Auth-Email', self.email)
+        return request
 
     @property
     def __zones_list_url(self):
