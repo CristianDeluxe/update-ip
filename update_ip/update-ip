@@ -3,6 +3,9 @@ import logging
 import sys
 from optparse import OptionParser
 
+import tld
+from tld.exceptions import TldIOError
+
 from update_ip import updater, configuration, VERSION, log
 from update_ip.services import services
 
@@ -38,11 +41,23 @@ def main():
         action="store_true",
         dest="wizard",
         help="Generate a new configuration file using a wizard")
+    parser.add_option(
+        "-t", "--update-tld",
+        action="store_true",
+        dest="update_tld",
+        help="Update TLDs database (useful for parse domain names)")
     (options, args) = parser.parse_args()
 
     if options.wizard:
         configuration.configurationWizard()
         sys.exit(0)
+
+    if options.update_tld:
+        try:
+            # Updates the known TLD names
+            tld.utils.update_tld_names()
+        except TldIOError:
+            error_exit(1, 'Fail while updating TLD file, you don\'t have enough permissions')
 
     if not args:
         error_exit(1, 'Please provide a configuration file as an '
@@ -56,7 +71,7 @@ def main():
             service_class = services[svc_name]
         except KeyError:
             error_exit(3, "Sorry, '%s' is not a valid service name. Available services: " % (
-            svc_name) + "\n  " + "\n  ".join(services.keys()))
+                svc_name) + "\n  " + "\n  ".join(services.keys()))
     except configuration.InvalidConfigFile as e:
         error_exit(2, str(e))
 
