@@ -9,13 +9,16 @@ from update_ip.services.base import BaseDNSService, DNSServiceError
 class CloudflareService(BaseDNSService):
     name = 'Cloudflare'
 
-    def __init__(self, email, api_key, domain, dns_type, **kwargs):
+    def __init__(self, email, api_key, dns_type, **kwargs):
         """Init the Cloudflare class
         :param email: Cloudflare login email
         :param api_key: Cloudflare Global API Key
         :param domain: Domain to update
         :param dns_type: Domain type (A: for IPv4, AAAA: for IPv6...)
         """
+        if not email or not api_key:
+            raise DNSServiceError('Email and "Global API key" are required for use the Cloudflare service.')
+
         # Updates the known TLD names
         tld.utils.update_tld_names()
 
@@ -33,7 +36,6 @@ class CloudflareService(BaseDNSService):
         # Domain Data
         self.domain = None
         self.dns_record = None
-        self.parse_domain(domain)
 
         # DNS Type
         self.record_type = dns_type
