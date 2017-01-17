@@ -1,6 +1,7 @@
 import ConfigParser
 import inspect
-from update_ip.services import services_by_name
+
+from update_ip.services import services
 
 
 class InvalidConfigFile(Exception):
@@ -62,7 +63,7 @@ def configurationWizard():
                 return x or None
 
     print 'Generating a new configuration file'
-    print 'Available services:' + '\n  ' + '\n  '.join(services_by_name.keys())
+    print 'Available services:' + '\n  ' + '\n  '.join(services.keys())
     filename = read_string('Configuration filename to write')
     options = {}
     for k, desc in zip(Configuration.OPTIONS, Configuration.OPTIONS_DESCRIPTIONS):
@@ -72,7 +73,7 @@ def configurationWizard():
 
     svc_name = options['service_name']
     try:
-        service = services_by_name[svc_name]
+        service = services[svc_name]
     except KeyError:
         print 'Sorry, "%s" is not a valid service name' % svc_name
         exit(3)
