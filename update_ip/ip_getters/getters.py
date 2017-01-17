@@ -6,11 +6,6 @@ class DynDns(BaseIpGetter):
     URL = "http://checkip.dyndns.org"
 
 
-class IfconfigMe(BaseIpGetter):
-    NAME = "ifconfig.me"
-    URL = "http://ifconfig.me/ip"
-
-
 class IPEchoNet(BaseIpGetter):
     NAME = "ipecho.net"
     URL = "http://ipecho.net/plain"
@@ -24,11 +19,6 @@ class IP4Me(BaseIpGetter):
 class WhatIsMyPublicIP(BaseIpGetter):
     NAME = "whatismypublicip.com"
     URL = "http://www.whatismypublicip.com/"
-
-
-class WhatIsMyIP(BaseIpGetter):
-    NAME = "whatismyip.com"
-    URL = "https://www.whatismyip.com/what-is-my-public-ip-address/"
 
 
 '''
