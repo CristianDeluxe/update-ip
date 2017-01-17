@@ -5,7 +5,8 @@ import glob
 from base import BaseDNSService
 
 
-def find_classes():
+def find_files():
+    """Find py files in services folder """
     for service_file_path in glob.glob(os.path.join(os.path.dirname(__file__), '*.py')):
         module_name = os.path.splitext(os.path.basename(service_file_path))[0]
 
@@ -17,7 +18,8 @@ def find_classes():
 
 
 def find_services():
-    for srvc, filename in find_classes():
+    """Find Services classes that are a sub-class of BaseDNSService """
+    for srvc, filename in find_files():
         module = imp.load_source(srvc, filename)
 
         for item in dir(module):
@@ -30,8 +32,13 @@ def find_services():
 
             yield obj
 
+
+# Services Dict
 services = {}
 
+# Add each found service to Dict
 for srv in find_services():
     services[srv.name] = srv
+
+# Remove Base class
 del services[BaseDNSService.name]
