@@ -1,11 +1,9 @@
-from update_ip.services.base import BaseDNSService, DNSServiceError
-import urllib2
 import json
+import urllib2
 
-try:
-    import tld
-except ImportError:
-    raise Exception('This service requires the tld package. You can install it by using "pip install tld"')
+import tld
+
+from update_ip.services.base import BaseDNSService, DNSServiceError
 
 
 class CloudflareService(BaseDNSService):
