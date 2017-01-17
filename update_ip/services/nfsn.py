@@ -19,9 +19,6 @@ class NearlyFreeSpeechService(BaseDNSService):
             raise DNSServiceError('Username and api_key are required for the NearlyFreeSpeech service.')
         self.nfsn = pynfsn.NFSN(username, api_key)
 
-        # Updates the known TLD names
-        tld.utils.update_tld_names()
-
     def update(self, whole_domain, ip):
         tld_info = tld.get_tld('http://' + whole_domain, as_object=True)
         dns = self.nfsn.dns(tld_info.domain)

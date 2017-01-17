@@ -20,9 +20,6 @@ class CloudflareService(BaseDNSService):
         if not email or not api_key:
             raise DNSServiceError('Email and "Global API key" are required for use the Cloudflare service.')
 
-        # Updates the known TLD names
-        tld.utils.update_tld_names()
-
         # Cloudflare data
         self.email = email
         self.api_key = api_key
