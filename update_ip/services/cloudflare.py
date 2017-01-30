@@ -58,7 +58,7 @@ class CloudflareService(BaseDNSService):
         self.dns_record = domain
 
     @staticmethod
-    def __parse_result(self, data):
+    def __parse_result(data):
         """Parse the JSON result and return a dict/list with data
         :param data: JSON data to parse
         """
