@@ -1,5 +1,6 @@
 import json
 import urllib2
+import logging
 
 import tld
 
@@ -86,14 +87,15 @@ class CloudflareService(BaseDNSService):
         request.get_method = lambda: 'PUT'
         opener = urllib2.build_opener(urllib2.HTTPHandler)
         result = opener.open(request)
-        # data = self.parse_result(result.read())
+        # data = self.__parse_result(result.read())
 
     def __get_zones(self):
         """Get the zone info for selected domain
         """
         data = self.__api_get_request(self.__zones_list_url)
-        if len(data[u'result']) > 0:
-            self.zone_id = data[u'result'][0][u'id']
+
+        if 'result' in data and len(data['result']) > 0:
+            self.zone_id = data['result'][0]['id']
         else:
             raise DNSServiceError('No info found for domain: ' + self.domain)
 
@@ -113,8 +115,8 @@ class CloudflareService(BaseDNSService):
 
         data = self.__api_get_request(self.__dns_list_url)
 
-        if len(data[u'result']) > 0:
-            self.record_id = data[u'result'][0][u'id']
+        if 'result' in data and len(data['result']) > 0:
+            self.record_id = data['result'][0]['id']
         else:
             raise DNSServiceError(
                 'No info found for DNS Record: "' + self.dns_record + '" with DNS type: "' + self.record_type + '"'
@@ -125,7 +127,9 @@ class CloudflareService(BaseDNSService):
         :param url: URL address
         """
         request = self.__create_request(url)
-        return self.__parse_result(urllib2.urlopen(request))
+        data = urllib2.urlopen(request)
+        data = data.read()
+        return self.__parse_result(data)
 
     def __create_request(self, url, data=None):
         """Creates the HTTP request and add headers
